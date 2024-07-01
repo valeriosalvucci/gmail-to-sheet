@@ -42,7 +42,7 @@ function appendDataToSheet(extractedData, sheetName, flag) {
 
     if (extractedData.length > 0) {
       const endRange = startRange + extractedData.length - 1;
-      const rangeAddr = 'A' + startRange + ':F' + endRange;
+      const rangeAddr = 'A' + startRange + ':G' + endRange;
       const dataRange = sheet.getRange(rangeAddr);
       dataRange.setValues(extractedData);
       Logger.log("Found data. Writing to " + sheetName);
@@ -206,7 +206,13 @@ function processEmailsSetapay(threads) {
 
         const accountNumber = extractValueFromBody(body, /<span>▼アカウントナンバー<\/span><br>\s*<span>(\d{4}-\d{4}-\d{4}-\d{4})<\/span><br>/);
         const dateAndTime = extractValueFromBody(body, /(\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})/);
-        const setagayaCoin = extractValueFromBody(body, /せたがやコイン\s*：\s*([\d,]+)/).replace(/,/g, '');
+        
+        let setagayaCoin = extractValueFromBody(body, /せたがやコイン\s*：\s*([\d,]+)/);
+        setagayaCoin = setagayaCoin ? setagayaCoin.replace(/,/g, '') : '0';
+        
+        let setagayaPoint = extractValueFromBody(body, /せたがやポイント：([\d,]+) ポイント/);
+        setagayaPoint = setagayaPoint ? setagayaPoint.replace(/,/g, '') : '0';
+        
         let amount = 0;
         let paymentRecipient = "Unknown";
         let transactionType = "Unknown";
@@ -225,7 +231,7 @@ function processEmailsSetapay(threads) {
           amount = extractValueFromBody(body, amountRegex).replace(/,/g, '');
         }
 
-        extractedData.push([dateAndTime, transactionType, paymentRecipient, sign * parseInt(amount), sign * parseInt(setagayaCoin), accountNumber]);
+        extractedData.push([dateAndTime, transactionType, paymentRecipient, sign * parseInt(amount), sign * parseInt(setagayaCoin), sign * parseInt(setagayaPoint), accountNumber]);
         toRemoveLabel.push(message);
 
       }
