@@ -42,7 +42,7 @@ function appendDataToSheet(extractedData, sheetName, flag) {
 
     if (extractedData.length > 0) {
       const endRange = startRange + extractedData.length - 1;
-      const rangeAddr = 'A' + startRange + ':G' + endRange;
+      const rangeAddr = 'A' + startRange + ':F' + endRange;
       const dataRange = sheet.getRange(rangeAddr);
       dataRange.setValues(extractedData);
       Logger.log("Found data. Writing to " + sheetName);
@@ -231,7 +231,12 @@ function processEmailsSetapay(threads) {
           amount = extractValueFromBody(body, amountRegex).replace(/,/g, '');
         }
 
-        extractedData.push([dateAndTime, transactionType, paymentRecipient, sign * parseInt(amount), sign * parseInt(setagayaCoin), sign * parseInt(setagayaPoint), accountNumber]);
+        if (parseInt(setagayaPoint) > 0) {
+          extractedData.push([dateAndTime, "point-used", "point-used", parseInt(setagayaPoint), parseInt(setagayaPoint), accountNumber]);
+        }
+
+
+        extractedData.push([dateAndTime, transactionType, paymentRecipient, sign * parseInt(amount), sign * (parseInt(setagayaCoin)+parseInt(setagayaPoint)), accountNumber]);
         toRemoveLabel.push(message);
 
       }
